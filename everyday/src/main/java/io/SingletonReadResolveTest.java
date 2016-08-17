@@ -13,6 +13,7 @@ import singleton.Singleton;
 
 public class SingletonReadResolveTest {
 
+	@SuppressWarnings("resource")
 	@Test
 	public void testResloveObject() throws Exception{
 		Singleton s1 = null;

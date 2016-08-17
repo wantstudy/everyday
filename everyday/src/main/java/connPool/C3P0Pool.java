@@ -10,7 +10,6 @@ import javax.sql.DataSource;
 import com.mchange.v2.c3p0.DataSources;
 
 import singleton.LoadPropertiesUtil;
-import util.SystemValue;
 
 public class C3P0Pool{
 

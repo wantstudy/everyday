@@ -1,5 +1,6 @@
 package nio.bufferchannl;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -7,37 +8,132 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Test;
 
 public class BufferAndChannel {
-    private static Logger logger = Logger.getLogger(BufferAndChannel.class);
+ 
+	private static Logger logger = Logger.getLogger(BufferAndChannel.class);
 
-    @Test
+	File file ;
+	File dfile = new File("d:/copy.txt");
+	ByteBuffer buffer;
+	
+    @Before
+    public void getFile(){
+    	file = new File("d:/singleton.txt");
+    	if(!dfile.exists()){
+    		try {
+				dfile.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+				logger.debug("create file fair");
+			}
+    	}
+    	
+    	//åˆ›å»ºBuffer
+    	buffer = ByteBuffer.allocate(15);
+    	buffer.clear();
+    	for (int i = 0; i < 10; i++) {
+			buffer.put((byte) i);
+		}
+    }
+    
+    @SuppressWarnings("resource")
+	@Test
     public void testgetbyteChannel() throws IOException{
-        String infile = "C:\\log_network.txt";  
-        String outfile = "C:\\copy.txt";  
-        // »ñÈ¡Ô´ÎÄ¼þºÍÄ¿±êÎÄ¼þµÄÊäÈëÊä³öÁ÷  
-        FileInputStream fin = new FileInputStream(infile);  
-        FileOutputStream fout = new FileOutputStream(outfile);  
-        // »ñÈ¡ÊäÈëÊä³öÍ¨µÀ  
-        FileChannel fcin = fin.getChannel();  
-        FileChannel fcout = fout.getChannel();  
-        // ´´½¨»º³åÇø  
-        ByteBuffer buffer = ByteBuffer.allocate(1024);
-        while (true) {  
-            // clear·½·¨ÖØÉè»º³åÇø£¬Ê¹Ëü¿ÉÒÔ½ÓÊÜ¶ÁÈëµÄÊý¾Ý  
-            buffer.clear();  
-            // ´ÓÊäÈëÍ¨µÀÖÐ½«Êý¾Ý¶Áµ½»º³åÇø  
-            int r = fcin.read(buffer);  
-            // read·½·¨·µ»Ø¶ÁÈ¡µÄ×Ö½ÚÊý£¬¿ÉÄÜÎªÁã£¬Èç¹û¸ÃÍ¨µÀÒÑµ½´ïÁ÷µÄÄ©Î²£¬Ôò·µ»Ø-1  
-            if (r == -1) {  
-                break;  
-            }  
-            // flip·½·¨ÈÃ»º³åÇø¿ÉÒÔ½«ÐÂ¶ÁÈëµÄÊý¾ÝÐ´ÈëÁíÒ»¸öÍ¨µÀ  
-            buffer.flip();  
-            // ´ÓÊä³öÍ¨µÀÖÐ½«Êý¾ÝÐ´Èë»º³åÇø  
-            fcout.write(buffer); 
-            logger.debug("success");
-        }
+		FileInputStream inputStream = new FileInputStream(file);
+    	FileOutputStream outputStream = new FileOutputStream(dfile);
+    	FileChannel readchannel = inputStream.getChannel(); //èŽ·å–é€šé“
+    	FileChannel writechannel = outputStream.getChannel();
+    	
+    	ByteBuffer buffer = ByteBuffer.allocate(1024);//èŽ·å–ç¼“å†²
+    	
+    	while(true){
+//    		buffer.rewind(); ä¸ºè¯»å–bufferä¸­æœ‰æ•ˆæ•°æ®åšå‡†å¤‡
+    		buffer.clear(); //ä¸ºé‡æ–°å†™å…¥bufferåšå‡†å¤‡
+    		int readlen = readchannel.read(buffer);  //ä»Žé€šé“ä¸­è¯»å–æ–‡ä»¶åˆ°ç¼“å†²
+    		if(readlen == -1){
+    			break;
+    		}
+    		buffer.flip();  //åœ¨è¯»å†™åˆ‡æ¢æ—¶æ“ä½œ
+    		writechannel.write(buffer);
+    	}
+    	
+    	readchannel.close();
+    	writechannel.close();
+    	
+    }
+    
+    /**
+     * mark()  è®°å½•å½“æœŸä½ç½®
+     * reset() æ¢å¤åˆ°è®°å½•çš„ä½ç½®
+     */
+    @Test
+    public void testBufferMark(){
+    	buffer.flip();
+    	for (int i = 0; i < buffer.limit(); i++) {
+			System.out.println(buffer.get());
+			if(i==4){
+				buffer.mark();
+				System.out.println("buffer mark at i : " + i);
+			}
+		}
+    	buffer.reset(); //å›žåˆ°mark
+    	System.out.println("reset to mark");
+    	while (buffer.hasRemaining()) {   //è¾“å‡ºä»Žmarkä¹‹åŽçš„æ•°æ®
+			System.out.println(buffer.get());
+		}
+    }
+    
+    
+    /**
+     * duplicate() å¤åˆ¶buffer
+     */
+    @Test
+    public void testCopyBuffer(){
+    	ByteBuffer newBuffer = buffer.duplicate(); //å¤åˆ¶ç¼“å†²åŒº
+    	System.out.println("after duplicate");
+    	System.out.println(buffer);
+    	System.out.println(newBuffer);
+    	
+    	newBuffer.flip();
+    	System.out.println("after flip");
+    	System.out.println(buffer);
+    	System.out.println(newBuffer);
+    	
+    	newBuffer.put((byte) 100); //æ–°ç¼“å†²åŒºç¬¬ä¸€ä½å­˜å…¥æ•°æ®100
+    	System.out.println("after put");
+    	System.out.println(buffer);		//æœ‰å„è‡ªçš„ç¼“å†²åŒºçš„ä½ç½®ä¿¡æ¯
+    	System.out.println(newBuffer);
+    	
+    	System.out.println(buffer.get(0));   //ä¸¤ä¸ªç¼“å†²åŒºéƒ½æ”¹å˜äº†
+    	System.out.println(newBuffer.get(0));
+    }
+    
+    
+    /**
+     * åªè¯»ç¼“å†²åŒºçš„æ“ä½œ
+     */
+    @Test
+    public void testReadOnlyBuffer(){
+    	ByteBuffer readBuffer = buffer.asReadOnlyBuffer(); //ç”Ÿæˆåªè¯»ç¼“å†²
+    	
+    	readBuffer.flip(); //è¯»å†™è½¬æ¢
+    	
+    	while (readBuffer.hasRemaining()) {
+			System.out.print(readBuffer.get() + " ");
+		}
+    	
+    	buffer.put(2,(byte)20); //ä¿®æ”¹åŽŸå§‹ç¼“å­˜ï¼Œåªè¯»ç¼“å†²å¯è§
+//    	readBuffer.put(2,(byte) 20); //æŠ›å¼‚å¸¸ï¼Œä¸å¯ä¿®æ”¹
+    	
+    	readBuffer.flip(); //è¯»å†™è½¬æ¢
+    	System.out.println();
+    	
+    	while (readBuffer.hasRemaining()) {
+			System.out.print(readBuffer.get() + " ");
+		}
+    	
     }
 }

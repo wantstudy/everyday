@@ -9,6 +9,10 @@ import javax.swing.JApplet;
 
 public class NoBufferMovingCircle extends JApplet implements Runnable{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	Image screenImage = null;
 	Thread thread;
 	int x = 5;
