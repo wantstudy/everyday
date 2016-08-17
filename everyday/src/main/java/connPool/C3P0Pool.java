@@ -9,13 +9,15 @@ import javax.sql.DataSource;
 
 import com.mchange.v2.c3p0.DataSources;
 
+import singleton.LoadPropertiesUtil;
 import util.SystemValue;
 
 public class C3P0Pool{
 
 	public static Connection getPoolCoon() throws Exception{
 		//连接mysql数据库
-		DataSource unpool = DataSources.unpooledDataSource(SystemValue.URL,SystemValue.USERNAME,SystemValue.PASSWORD);
+//		DataSource unpool = DataSources.unpooledDataSource(SystemValue.URL,SystemValue.USERNAME,SystemValue.PASSWORD);
+		DataSource unpool = DataSources.unpooledDataSource(LoadPropertiesUtil.JDBC_URL,LoadPropertiesUtil.JDBC_USERNAME,LoadPropertiesUtil.JDBC_PASSWORD);
 		//创建连接池
 		DataSource pooledDataSource = DataSources.pooledDataSource(unpool);
 		//获取连接
@@ -25,9 +27,9 @@ public class C3P0Pool{
 	
 	public static void main(String[] args) {
 		try {
-			Class.forName(SystemValue.CLASS_NAME);
+			Class.forName(LoadPropertiesUtil.JDBC_CLASSNAME);
 			//连接mysql数据库
-			DataSource unpool = DataSources.unpooledDataSource(SystemValue.URL,SystemValue.USERNAME,SystemValue.PASSWORD);
+			DataSource unpool = DataSources.unpooledDataSource(LoadPropertiesUtil.JDBC_URL,LoadPropertiesUtil.JDBC_USERNAME,LoadPropertiesUtil.JDBC_PASSWORD);
 			//创建连接池
 			DataSource pooledDataSource = DataSources.pooledDataSource(unpool);
 			Connection connection = null;
