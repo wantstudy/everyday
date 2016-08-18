@@ -1,7 +1,6 @@
 package reference;
 
 import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
 
 /**
  * 检查引用队列，监控对象回收情况

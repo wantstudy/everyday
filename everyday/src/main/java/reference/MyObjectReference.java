@@ -103,6 +103,7 @@ public class MyObjectReference {
 		System.out.println("maxMemory : " + maxMemory );
 		System.out.println("freeMemory : " + Runtime.getRuntime().freeMemory());
 		//创建软引用
+		@SuppressWarnings("unused")
 		PhantomReference<MyObject> reference = new PhantomReference<MyObject>(myObject,queue);
 		
 		//检查引用队列，监控对象回收情况
