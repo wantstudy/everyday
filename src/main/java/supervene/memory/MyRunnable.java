@@ -12,7 +12,8 @@ public class MyRunnable implements Runnable{
         methodOne();
     }
 
-    public void methodOne() {
+    @SuppressWarnings("unused")
+	public void methodOne() {
         int localVariable1 = 45;
 
         MySharedObject localVariable2 =
@@ -23,7 +24,8 @@ public class MyRunnable implements Runnable{
         methodTwo();
     }
 
-    public void methodTwo() {
+    @SuppressWarnings("unused")
+	public void methodTwo() {
         Integer localVariable1 = new Integer(99);
 
         //... do more with local variable.

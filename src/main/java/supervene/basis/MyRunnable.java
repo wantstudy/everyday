@@ -1,7 +1,6 @@
 package supervene.basis;
 
 import org.junit.Test;
-import org.omg.CORBA.LocalObject;
 
 public class MyRunnable implements Runnable{
 
